@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Logout</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f2f2f2;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      background-color: #ff4d4d;
+      color: white;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #e60000;
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 16px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+
+<div>
+  <button id="logoutBtn">Logout</button>
+  <div id="message"></div>
+</div>
+
+<script>
+  const logoutBtn = document.getElementById("logoutBtn");
+  const messageDiv = document.getElementById("message");
+
+  logoutBtn.addEventListener("click", async () => {
+    const token = localStorage.getItem("token"); // make sure token is stored during login
+    if (!token) {
+      messageDiv.textContent = "You are not logged in!";
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:3000/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-session-token": token
+        }
+      });
+      const data = await res.json();
+      if (data.success) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("username");
+        messageDiv.style.color = "green";
+        messageDiv.textContent = "✅ Successfully logged out!";
+        setTimeout(() => {
+          window.location.href = "index.html"; // redirect to login page
+        }, 1500);
+      } else {
+        messageDiv.style.color = "red";
+        messageDiv.textContent = "❌ Logout failed!";
+      }
+    } catch (err) {
+      messageDiv.style.color = "red";
+      messageDiv.textContent = "❌ Error: " + err.message;
+    }
+  });
+</script>
+
+</body>
+</html>

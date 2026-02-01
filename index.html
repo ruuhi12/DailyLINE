@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+
+<body>
+
+  <form id="signupForm">
+
+    <div class="signup-wrapper">
+
+      <div class="signup-card">
+
+        <div class="signup-header">
+          <h2>Create Account</h2>
+        </div>
+
+        <div class="signup-fields">
+          <input type="text" placeholder="Username" id="username">
+          <input type="email" placeholder="Email" id="email">
+          <input type="password" placeholder="Password" id="password">
+        </div>
+
+        <div class="signup-actions">
+          <button type="submit" class="signup-btn">Sign Up</button>
+        </div>
+
+        <div class="signup-footer">
+          <p>
+            Already have an account?
+            <a href="login.html">Login</a>
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </form>
+
+</body>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: url("Untitled design.jpg") center/cover no-repeat fixed;
+}
+
+/* MAIN WRAPPER */
+.signup-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* CARD */
+.signup-card {
+  width: 360px;
+  padding: 45px;
+  background: rgba(90, 45, 45, 0.2);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  color: white;
+}
+
+/* HEADER */
+.signup-header h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+/* INPUTS */
+.signup-fields input {
+  width: 100%;
+  padding: 11px;
+  margin: 8px 0;
+  border-radius: 22px;
+  border: none;
+  outline: none;
+  background: rgba(255, 255, 255, 0.18);
+  color: white;
+  font-size: 14px;
+}
+
+.signup-fields input::placeholder {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+}
+
+/* BUTTON */
+.signup-btn {
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 26px;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  color: #5a2d2d;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.signup-btn:hover {
+  background: #ffffff;
+  transform: scale(1.03);
+}
+
+/* FOOTER */
+.signup-footer {
+  margin-top: 14px;
+  font-size: 13px;
+}
+
+.signup-footer a {
+  color: #e0f0ff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.signup-footer a:hover {
+  text-decoration: underline;
+}
+</style>
+<script>
+document.getElementById("signupForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  const username = document.getElementById("username").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  if (!username || !email || !password) {
+    alert("Please fill all fields ❌");
+    return;
+  }
+
+  try {
+    const res = await fetch("http://localhost:3000/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, email, password })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      alert("Signup successful ✅");
+      window.location.href = "login.html"; // redirect to login
+    } else {
+      // If email already exists, show proper message
+      alert("Email already exists ❌. Try logging in.");
+    }
+  } catch (err) {
+    console.error("Signup error:", err);
+    alert("Something went wrong. Please try again later ❌");
+  }
+});
+</script>
+
+
+
+</html>

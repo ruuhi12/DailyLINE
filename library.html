@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Library</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body {
+  margin: 0;
+  background-image: url(homepageimg.jpg);
+  background-size: cover;
+  background-position: center;
+}
+
+/* HEADER */
+.header {
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.pic {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+}
+
+/* MENU */
+.center-box {
+  height: 10vh;
+  display: flex;
+  align-items: center;
+}
+.menu-container {
+  position: relative;
+}
+.menu-btn {
+  background-color: #5a2d2d;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+}
+#menu { display: none; }
+.drop {
+  display: none;
+  position: absolute;
+  top: 45px;
+  left: 0;
+  background-color: #f5e6d3;
+  width: 160px;
+  border-radius: 6px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+#menu:checked + .menu-btn + .drop { display: block; }
+.drop a {
+  display: block;
+  padding: 10px;
+  text-decoration: none;
+  color: black;
+}
+.drop a:hover { background-color: #e0cbb0; }
+
+/* LIBRARY */
+#libraryContent {
+  margin-top: 60px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+/* QUOTE CARD */
+.quote-card {
+  width: 350px;
+  min-height: 360px;
+  background-image: url("page.jpeg");
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 18px;
+  color: #000;
+  padding: 20px;
+  position: relative;
+}
+
+/* BUTTONS */
+.save-btn, .delete-btn, .edit-btn {
+  border: none;
+  border-radius: 50%;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-size: 16px;
+  position: absolute;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  transition: 0.2s;
+}
+.save-btn:hover { color: #7CFC00; transform: scale(1.1);}
+.delete-btn:hover { color: #ff4d4d; transform: scale(1.1);}
+.edit-btn:hover { background: rgba(0,0,0,0.8); transform: scale(1.1);}
+.save-btn { bottom: 3px; left: 8px; }
+.delete-btn { bottom: 3px; right: 8px; }
+.edit-btn { top: 10px; right: 10px; }
+/* QUOTE CARD */
+.quote-card {
+  width: 350px;
+  height: 420px;
+  background-image: url("page.jpeg");
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  position: relative;
+}
+
+/* SAFE TEXT AREA */
+.quote-text {
+  position: absolute;
+  top: 90px;
+  bottom: 80px;
+  left: 35px;
+  right: 35px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+  overflow: hidden;
+}
+
+/* TEXT WRAP FIX */
+.quote-content {
+  font-size: 17px;
+  line-height: 1.6;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+/* AUTHOR */
+.quote-author {
+  margin-top: 12px;
+  font-size: 12px;
+  font-style: italic;
+  opacity: 0.85;
+}
+
+
+/* AUTHOR */
+.quote-author {
+  margin-top: 12px;
+  font-size: 12px;
+  font-style: italic;
+  opacity: 0.85;
+}
+.quote-content {
+  font-size: 18px;
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+  <div class="logo">
+    <img src="mylogo.jpg" class="pic">
+    <h1>𝓓𝓪𝓲𝓵𝔂 𝓛𝓲𝓷𝓮𝓼</h1>
+  </div>
+</header>
+
+<div class="center-box">
+  <div class="menu-container">
+    <input type="checkbox" id="menu">
+    <label for="menu" class="menu-btn">☰ Library</label>
+    <div class="drop">
+      <a href="#" onclick="showSection('work')">My Work</a>
+      <a href="#" onclick="showSection('saved')">Saved</a>
+    </div>
+  </div>
+</div>
+
+<div id="libraryContent"></div>
+
+<script>
+const sessionToken = sessionStorage.getItem("token");
+const username = sessionStorage.getItem("username");
+
+if (!sessionToken) {
+  alert("You must log in first!");
+  window.location.href = "login.html";
+}
+
+/* SHOW SECTION */
+function showSection(type) {
+  const container = document.getElementById("libraryContent");
+  container.innerHTML = "<p>Loading...</p>";
+
+  if (type === "work") {
+    fetch("http://localhost:3000/all-quotes")
+      .then(res => res.json())
+      .then(data => {
+        const quotes = data.quotes.filter(q => q.username === username);
+        renderQuotes(quotes, "work");
+      });
+  }
+
+  if (type === "saved") {
+    fetch("http://localhost:3000/saved-quotes", {
+      headers: { "x-session-token": sessionToken }
+    })
+      .then(res => res.json())
+      .then(data => renderQuotes(data.savedQuotes || [], "saved"));
+  }
+}
+
+/* RENDER QUOTES */
+function renderQuotes(quotes, type) {
+  const container = document.getElementById("libraryContent");
+  container.innerHTML = "";
+
+  if (!quotes.length) {
+    container.innerHTML = "<p>Nothing here yet 🌿</p>";
+    return;
+  }
+
+  quotes.forEach(quote => {
+    const card = document.createElement("div");
+    card.className = "quote-card";
+
+    const text = quote.text || "No text";
+
+    // ✅ FINAL AUTHOR LOGIC (NO CURRENT USER LEAK)
+    const author = quote.penName || quote.author || "Anonymous";
+
+    card.innerHTML = `
+      <div class="quote-text">
+        <div class="quote-content">${text}</div>
+        <div class="quote-author">— ${author}</div>
+      </div>
+    `;
+
+    // SAVE button
+    const saveBtn = document.createElement("button");
+    saveBtn.className = "save-btn";
+    saveBtn.innerHTML = '<i class="fa-regular fa-bookmark"></i>';
+    saveBtn.onclick = () => {
+      fetch("http://localhost:3000/save-quote", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-session-token": sessionToken
+        },
+      body: JSON.stringify({
+  text: quote.text,
+  originalUsername: quote.username,
+  penName: quote.author || quote.penName
+})
+
+      }).then(() => alert("Saved ❤️"));
+    };
+    card.appendChild(saveBtn);
+
+    // DELETE + EDIT (My Work)
+    if (type === "work") {
+      const delBtn = document.createElement("button");
+      delBtn.className = "delete-btn";
+      delBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+      delBtn.onclick = () => {
+        fetch("http://localhost:3000/delete-quote", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-session-token": sessionToken
+          },
+          body: JSON.stringify({ id: quote.id })
+        }).then(() => showSection("work"));
+      };
+      card.appendChild(delBtn);
+    }
+
+    // REMOVE (Saved)
+    if (type === "saved") {
+      const removeBtn = document.createElement("button");
+      removeBtn.className = "delete-btn";
+      removeBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+      removeBtn.onclick = () => {
+        fetch("http://localhost:3000/remove-saved-quote", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-session-token": sessionToken
+          },
+          body: JSON.stringify({ text })
+        }).then(() => showSection("saved"));
+      };
+      card.appendChild(removeBtn);
+    }
+
+    container.appendChild(card);
+  });
+}
+
+window.onload = () => showSection("work");
+</script>
+
+</body>
+</html> 

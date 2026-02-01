@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Profile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  margin: 0;
+  background: url(homepageimg.jpg) center/cover no-repeat fixed;
+  font-family: Arial, sans-serif;
+  color: #5a2d2d;
+}
+
+.header {
+  padding: 20px 40px;
+  display: flex;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.pic {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+}
+
+.box {
+  max-width: 600px;
+  margin: 40px auto;
+  background: rgba(255,255,255,0.85);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.3);
+}
+
+input, textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  border: 1px solid #5a2d2d;
+}
+
+input[readonly] {
+  background: #eee;
+}
+
+button {
+  padding: 12px 30px;
+  font-size: 16px;
+  background: #2b2b2b;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+}
+button:hover { background: black; }
+</style>
+</head>
+
+<body>
+
+<header class="header">
+  <div class="logo">
+    <img src="mylogo.jpg" class="pic">
+    <h1>𝓓𝓪𝓲𝓵𝔂 𝓛𝓲𝓷𝓮𝓼</h1>
+  </div>
+</header>
+
+<div class="box">
+  <h2>PROFILE</h2>
+
+  <form onsubmit="saveProfile(event)">
+    <label>Username</label>
+    <input type="text" id="username" readonly>
+
+    <label>Pen Name</label>
+    <input type="text" id="penName">
+
+    <label>Bio</label>
+    <textarea id="bio" rows="5"></textarea>
+
+    <button type="submit">Save Profile</button>
+  </form>
+</div>
+<script>
+const token = sessionStorage.getItem("token");
+const username = sessionStorage.getItem("username");
+
+if (!token) {
+  alert("You must log in first!");
+  window.location.href = "login.html";
+}
+
+// SHOW USERNAME
+document.getElementById("username").value = username || "";
+
+// LOAD PROFILE DATA
+fetch("http://localhost:3000/profile", {
+  headers: {
+    "x-session-token": token
+  }
+})
+.then(res => res.json())
+.then(data => {
+  document.getElementById("penName").value = data.penName || "";
+  document.getElementById("bio").value = data.bio || "";
+});
+
+// SAVE PROFILE
+function saveProfile() {
+  fetch("http://localhost:3000/profile", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-session-token": token
+    },
+    body: JSON.stringify({
+      penName: document.getElementById("penName").value,
+      bio: document.getElementById("bio").value
+    })
+  }).then(() => alert("Profile saved ❤️"));
+}
+</script>
+
+
+</body>
+</html>
